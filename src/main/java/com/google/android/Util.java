@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.desktop.proofer;
+package com.google.android;
 
 import java.awt.*;
 import java.io.BufferedReader;

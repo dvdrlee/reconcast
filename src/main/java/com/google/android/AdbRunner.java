@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.desktop.proofer;
+package com.google.android;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,12 +35,12 @@ public class AdbRunner {
     public AdbRunner() {
         try {
             prepareAdb();
-        } catch (ProoferException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void prepareAdb() throws ProoferException {
+    private void prepareAdb() throws Exception {
         if (debug) {
             System.out.println("Preparing ADB");
         }
@@ -55,7 +55,7 @@ public class AdbRunner {
 
         Util.OS currentOS = Util.getCurrentOS();
         if (currentOS == Util.OS.Other) {
-            throw new ProoferException("Unknown operating system, cannot run ADB.");
+            throw new Exception("Unknown operating system, cannot run ADB.");
         }
 
         switch (currentOS) {
@@ -74,7 +74,7 @@ public class AdbRunner {
         }
 
         if (!adbPath.setExecutable(true)) {
-            throw new ProoferException("Error setting ADB binary as executable.");
+            throw new Exception("Error setting ADB binary as executable.");
         }
 
         Util.putCacheVersion(ADB_CACHE_VERSION);
@@ -83,17 +83,17 @@ public class AdbRunner {
     }
 
     private File extractAssetToCacheDirectory(String assetPath, String filename, boolean force)
-            throws ProoferException {
+            throws Exception {
         File outFile = new File(Util.getCacheDirectory(), filename);
         if (force || !outFile.exists()) {
             if (!Util.extractResource("assets/" + assetPath, outFile)) {
-                throw new ProoferException("Error extracting to " + outFile.toString());
+                throw new Exception("Error extracting to " + outFile.toString());
             }
         }
         return outFile;
     }
 
-    public String adb(String[] args) throws ProoferException {
+    public String adb(String[] args) throws Exception {
         if (debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Calling ADB: adb");
@@ -131,9 +131,9 @@ public class AdbRunner {
             returnCode = pr.waitFor();
 
         } catch (InterruptedException e) {
-            throw new ProoferException(e);
+            throw new Exception(e);
         } catch (IOException e) {
-            throw new ProoferException(e);
+            throw new Exception(e);
         }
 
         String out = sb.toString();
@@ -143,7 +143,7 @@ public class AdbRunner {
         }
 
         if (returnCode != 0) {
-            throw new ProoferException("ADB returned error code " + returnCode);
+            throw new Exception("ADB returned error code " + returnCode);
         }
 
         return out;
