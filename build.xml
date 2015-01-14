@@ -1,0 +1,68 @@
+<project name="AndroidProjector" basedir="." default="jar">
+    <property name="src.dir" value="src"/>
+    <property name="scripts.dir" value="scripts"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir" value="${build.dir}/jar"/>
+    <property name="package.dir" value="${build.dir}/package"/>
+
+    <property name="main-class" value="com.google.android.AndroidProjector"/>
+
+    <!-- android.tools.dir is set in local.properties -->
+    <property file="local.properties"/>
+    <fail message="Please specify android.tools.dir in local.properties!">
+        <condition>
+            <equals arg1="${android.tools.dir}" arg2=""/>
+        </condition>
+    </fail>
+
+    <!-- Run "ant -Dvmarch=64" if you're using 64-bit JVM -->
+    <condition property="swt.dir" value="${android.tools.dir}/lib/x86_64">
+        <equals arg1="${vmarch}" arg2="64"/>
+    </condition>
+    <condition property="swt.dir" value="${android.tools.dir}/lib/x86">
+        <not>
+            <isset property="swt.dir"/>
+        </not>
+    </condition>
+
+    <path id="classpath">
+        <pathelement location="${android.tools.dir}/lib/ddmlib.jar"/>
+        <pathelement location="${swt.dir}/swt.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="src" destdir="${classes.dir}" classpathref="classpath"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="package" depends="jar">
+        <mkdir dir="${package.dir}"/>
+        <zip destfile="${package.dir}/${ant.project.name}.zip">
+            <zipfileset file="${jar.dir}/${ant.project.name}.jar" prefix="${ant.project.name}"/>
+            <zipfileset dir="${scripts.dir}" filemode="755" prefix="${ant.project.name}"/>
+        </zip>
+    </target>
+
+    <target name="run" depends="jar">
+        <java classname="${main-class}" fork="true">
+            <classpath>
+                <path location="${jar.dir}/${ant.project.name}.jar"/>
+                <path refid="classpath"/>
+            </classpath>
+        </java>
+    </target>
+</project>

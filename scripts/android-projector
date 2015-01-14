@@ -1,0 +1,38 @@
+#!/bin/sh
+# Copyright 2010 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+BASEDIR=`dirname $0`
+TOOLSDIR=`dirname $(which android)`
+LIBDIR=$TOOLSDIR/lib
+
+# Use tools in Android SDK to figure out the swt.jar for the current JVM.
+VMARCH=`java -jar "$LIBDIR/archquery.jar"`
+SWTDIR=$LIBDIR/$VMARCH
+
+if [ `uname` = "Darwin" ]; then
+    OSOPTS="-XstartOnFirstThread"
+else
+    OSOPTS=
+fi
+
+if [ `uname` = "Linux" ]; then
+    export GDK_NATIVE_WINDOWS=true
+fi
+
+# Ensure that adb server is running
+adb start-server
+
+# Start Android Projector
+exec java $OSOPTS -Djava.ext.dirs="$LIBDIR:$SWTDIR" -jar "$BASEDIR/AndroidProjector.jar"
