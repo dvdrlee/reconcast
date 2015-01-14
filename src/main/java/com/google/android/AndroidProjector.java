@@ -47,14 +47,17 @@ public class AndroidProjector {
     private final static String ADB_HOST = "127.0.0.1";
     private final static int ADB_PORT = 5037;
     private final static int WAIT_TIME = 5;  // ms
+    private final static int ADB_RETRY_ATTEMPTS = 3;
 
     private void open() throws IOException {
-        Display.setAppName("Android Projector");
+        Display.setAppName("ReconCast");
         Display display = new Display();
         Shell shell = new Shell(display);
-        shell.setText("Device Screen");
+        shell.setText("ReconCast");
         createContents(shell);
         shell.open();
+
+        initAdb();
 
         SocketChannel adbChannel = null;
         try {
@@ -109,6 +112,29 @@ public class AndroidProjector {
         mImageLabel = new Label(shell, SWT.BORDER);
         mImageLabel.pack();
         shell.pack();
+    }
+
+    /**
+     * Attempt to connect multiple times to adb
+     * killing and restarting the adb server seems to be required in some cases
+    **/
+    private void initAdb(){
+        int attempts = 0;
+        while(attempts<=ADB_RETRY_ATTEMPTS){
+            try{
+                AdbRunner adbRunner = new AdbRunner();
+                adbRunner.adb(new String[]{"kill-server"});
+                adbRunner.adb(new String[]{"devices"});
+                SocketChannel socket = connectAdbDevice(); 
+                if (socket!=null){
+                    return;
+                }
+            }catch(Exception e){
+                
+            }
+            System.out.println("Failed attempt: " + attempts + " of " + ADB_RETRY_ATTEMPTS);
+            attempts ++;
+        }
     }
 
     private SocketChannel connectAdbDevice() throws IOException {
@@ -232,15 +258,6 @@ public class AndroidProjector {
     }
 
     public static void main(String[] args) {
-        try{
-            AdbRunner adbRunner = new AdbRunner();
-            adbRunner.adb(new String[]{"kill-server"});
-            adbRunner.adb(new String[]{"devices"});
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        
-
         AndroidProjector androidProjector = new AndroidProjector();
         try {
             androidProjector.open();
