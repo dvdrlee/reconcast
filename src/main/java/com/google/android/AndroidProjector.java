@@ -55,6 +55,7 @@ public class AndroidProjector {
         Shell shell = new Shell(display);
         shell.setText("ReconCast");
         createContents(shell);
+        shell.setSize(428, 240);
         shell.open();
 
         initAdb();
@@ -132,8 +133,8 @@ public class AndroidProjector {
             }catch(Exception e){
                 
             }
-            System.out.println("Failed attempt: " + attempts + " of " + ADB_RETRY_ATTEMPTS);
             attempts ++;
+            System.out.println("Failed attempt: " + attempts + " of " + ADB_RETRY_ATTEMPTS);
         }
     }
 
@@ -252,9 +253,44 @@ public class AndroidProjector {
                 1,
                 rawImage.data);
         Image image = new Image(shell.getDisplay(), imageData);
-        mImageLabel.setImage(image);
+        Image scaledImage = scaleImage(image, shell.getSize().x, shell.getSize().y);
+        mImageLabel.setImage(scaledImage);
         mImageLabel.pack();
-        shell.pack();
+        image.dispose();
+        scaledImage.dispose();
+    }
+
+    /**
+     * Helper function to scale an image
+    **/
+    private Image scaleImage(Image image, int width, int height) {
+
+        ImageData data = image.getImageData();
+
+        // Some logic to keep the aspect ratio
+        float img_height = data.height;
+        float img_width = data.width;
+        float container_height = height;
+        float container_width = width;
+
+        float dest_height_f = container_height;
+        float factor = img_height / dest_height_f;
+
+        int dest_width = (int) Math.floor(img_width / factor );
+        int dest_height = (int) dest_height_f;
+
+        if(dest_width > container_width) {
+            dest_width = (int) container_width;
+            factor = img_width / dest_width;
+            dest_height = (int) Math.floor(img_height / factor);
+
+        }
+
+        // Image resize
+        data = data.scaledTo(dest_width, dest_height);
+        Image scaled = new Image(Display.getDefault(), data);
+        image.dispose();
+        return scaled;
     }
 
     public static void main(String[] args) {
