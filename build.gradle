@@ -1,10 +1,27 @@
+apply plugin: 'macAppBundle'
+
+macAppBundle {
+    mainClassName = "com.google.android.AndroidProjector"
+    bundleJRE = true
+    bundleExtras.put("JVMOptions", ["-XstartOnFirstThread"])
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'edu.sc.seis.gradle:macappbundle:2.0.0'
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'application'
 
 mainClassName = 'com.google.android.AndroidProjector'
 
 jar {
-    baseName = 'reconcast'
+    baseName = 'ReconCast'
     version =  '0.1'
 
     // bundle dependencies in the jar output 
