@@ -86,7 +86,7 @@ public class AdbRunner {
             throws Exception {
         File outFile = new File(Util.getCacheDirectory(), filename);
         if (force || !outFile.exists()) {
-            if (!Util.extractResource("assets/" + assetPath, outFile)) {
+            if (!Util.extractResource(assetPath, outFile)) {
                 throw new Exception("Error extracting to " + outFile.toString());
             }
         }
@@ -108,6 +108,7 @@ public class AdbRunner {
 
         List<String> argList = new ArrayList<String>();
         argList.add(0, adbPath.getAbsolutePath());
+        System.out.println(argList);
         //argList.add(1, "-e");
         Collections.addAll(argList, args);
 

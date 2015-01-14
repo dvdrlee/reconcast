@@ -232,11 +232,20 @@ public class AndroidProjector {
     }
 
     public static void main(String[] args) {
+        try{
+            AdbRunner adbRunner = new AdbRunner();
+            adbRunner.adb(new String[]{"kill-server"});
+            adbRunner.adb(new String[]{"devices"});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        
+
         AndroidProjector androidProjector = new AndroidProjector();
         try {
             androidProjector.open();
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }
