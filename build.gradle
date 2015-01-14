@@ -1,0 +1,29 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'com.google.android.AndroidProjector'
+
+jar {
+    baseName = 'reconcast'
+    version =  '0.1'
+
+    // bundle dependencies in the jar output 
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+
+    manifest {
+        attributes 'Main-Class': 'com.google.android.AndroidProjector'
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://swt-repo.googlecode.com/svn/repo/"
+    }
+}
+
+dependencies {
+    // default to Mac 64 bit swt library for now
+    compile "org.eclipse.swt:org.eclipse.swt.cocoa.macosx.x86_64:4.3"
+    compile "com.google.android.tools:ddmlib:r13"
+}
