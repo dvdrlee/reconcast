@@ -2,8 +2,7 @@
 
 Mac application that allows you to screencast your Recon HUD to your Mac.
 
-Forked from https://code.google.com/p/android-projector/
-with ADB code borrowed from https://github.com/romannurik/AndroidDesignPreview
+**[Download ReconCast](https://github.com/dvdrlee/reconcast/releases)**
 
 Build Instructions
 --------
@@ -23,3 +22,6 @@ Create Mac App Package
 Create dmg
 
     gradlew createDmg
+    
+Forked from https://code.google.com/p/android-projector/
+with ADB code borrowed from https://github.com/romannurik/AndroidDesignPreview
