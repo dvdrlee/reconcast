@@ -36,10 +36,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.MessageBox;
 
 import com.android.ddmlib.RawImage;
 
 public class AndroidProjector {
+
+    private Shell mShell;
     private Label mImageLabel;
     private RawImage mRawImage;
     private boolean mRotateImage = false;
@@ -52,17 +55,17 @@ public class AndroidProjector {
     private void open() throws IOException {
         Display.setAppName("ReconCast");
         Display display = new Display();
-        Shell shell = new Shell(display);
-        shell.setText("ReconCast");
-        createContents(shell);
-        shell.setSize(428, 240);
-        shell.open();
+        mShell = new Shell(display);
+        mShell.setText("ReconCast");
+        createContents(mShell);
+        mShell.setSize(428, 240);
+        mShell.open();
 
         initAdb();
 
         SocketChannel adbChannel = null;
         try {
-            while (!shell.isDisposed()) {
+            while (!mShell.isDisposed()) {
                 if (!display.readAndDispatch()) {
                     adbChannel = connectAdbDevice();
                     if (adbChannel == null)
@@ -70,7 +73,7 @@ public class AndroidProjector {
 
                     if (startFramebufferRequest(adbChannel)) {
                         getFramebufferData(adbChannel);
-                        updateDeviceImage(shell, mRotateImage ? mRawImage.getRotated() : mRawImage);
+                        updateDeviceImage(mShell, mRotateImage ? mRawImage.getRotated() : mRawImage);
                     }
                     adbChannel.close();
                 }
@@ -136,6 +139,14 @@ public class AndroidProjector {
             attempts ++;
             System.out.println("Failed attempt: " + attempts + " of " + ADB_RETRY_ATTEMPTS);
         }
+        showErrorMessage();
+    }
+
+    private void showErrorMessage(){
+        MessageBox messageDialog = new MessageBox(mShell, SWT.ERROR);
+        messageDialog.setText("Failed to connect to HUD");
+        messageDialog.setMessage("Make sure your HUD is plugged in, and 'USB Debugging' is enabled in Settings -> Advanced");
+        messageDialog.open();
     }
 
     private SocketChannel connectAdbDevice() throws IOException {
